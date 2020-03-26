@@ -1,4 +1,4 @@
-name: tpl
+name: tmpl
 version: 1.0.0
 dependencies:
   intl: ^0.16.1
