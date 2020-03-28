@@ -5,6 +5,14 @@ import 'extensions/map.dart';
 final _slotsRegexp = RegExp(
   r'\$\{(?<name>[A-Za-z0-9_\.]+)\}' +
       r'(\|(?<format>[a-z]+)(\((?<formatValue>.*)\))?)?',
+  multiLine: true,
+  dotAll: true,
+);
+
+final _conditionRegexp = RegExp(
+  r'\?\(\([\s*]?(?<content>.*)?\)\((?<variable_name>[A-Za-z0-9_\.]+)\)\)',
+  multiLine: true,
+  dotAll: true,
 );
 
 class Template {
@@ -26,6 +34,19 @@ class Template {
 
   String compile(Map<String, dynamic> data) {
     String compiled = _source;
+
+    while (true) {
+      final match = _conditionRegexp.firstMatch(compiled);
+      if (match == null) break;
+      final content = match.namedGroup('content');
+      final varName = match.namedGroup('variable_name');
+
+      compiled = compiled.replaceRange(
+        match.start,
+        match.end,
+        (data[varName] ?? false) ? content : '',
+      );
+    }
 
     while (true) {
       final match = _slotsRegexp.firstMatch(compiled);

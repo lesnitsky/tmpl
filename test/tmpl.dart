@@ -23,4 +23,30 @@ void main() {
 
     expect(value, equals('<div>2020-03-26</div>'));
   });
+
+  test('evaluates conditions', () {
+    final tpl = Template(r'?((<div>something</div>)(value))');
+
+    expect(tpl.compile({'value': true}), equals('<div>something</div>'));
+    expect(tpl.compile({'value': false}), equals(''));
+    expect(tpl.compile({'value': null}), equals(''));
+  });
+
+  test('evaluates conditions and interpolates values', () {
+    final tpl = Template(r'''
+?((
+  <div>
+    ${value}
+  </div>
+)(condition))''');
+
+    expect(
+      tpl.compile({'value': '42', 'condition': true}),
+      equals(r'''
+  <div>
+    42
+  </div>
+'''),
+    );
+  });
 }
